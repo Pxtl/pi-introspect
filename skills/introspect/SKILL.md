@@ -19,3 +19,9 @@ pi-introspect exposes self-reflection tools: the agent inspecting its own runtim
 - Results come back as JSON in `content` and again in `details`.
 - `xhigh`/`max` thinking levels use the `high` budget; `off` means no thinking budget.
 - The tools report state; they cannot change the model or thinking level (use the user's `/model` and `/thinking` commands for that).
+
+## Field notes (live-verified)
+
+- `introspect_model.maxTokens` is pi's **runtime** model value, not the raw catalog entry. For llama-discovered models, pi's llama provider builds the model with `maxTokens = contextWindow` (pi-coding-agent `dist/extensions/llama/provider.js`), so it can exceed the `maxTokens` in `models.json`. Catalog models that omit `maxTokens` default to 16384 (pi model-config schema).
+- `thinkingBudgets` settings overrides apply only to the four budget levels (`minimal`, `low`, `medium`, `high`). An `xhigh` key in settings is not a budget override - `xhigh`/`max` always use the `high` budget. Effective budget = pi defaults, overridden by agent-directory `settings.json`, then project `.pi/settings.json` (project wins).
+- `introspect_thinking.thinkingLevel` is the **active session** level, not `defaultThinkingLevel` from settings - it can differ if the session was started with another level.
