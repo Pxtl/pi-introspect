@@ -12,9 +12,9 @@
 
 ## Variable Naming
 
-- Variable names should be clear and informative. While abbreviations are
-  permitted, they should be common jargon and not invented (eg "Cfg" for
-  "Config" is good).
+- Variable names should be lowerCamelCase, clear, and informative. While
+  abbreviations are permitted, they should be common jargon and not invented
+  (eg `cfg` for `config` is good).
 - Hyper-brief one-or-two character names are okay for loop indexes and lambda
   parameters, but they should still be informative: `i` for a for-loop counter,
   or the first char of the object's name
@@ -207,6 +207,6 @@ boolean property names.
 - **Do not test private members via reflection or by reaching into module
   internals.**  Instead:
   - Export the member for tests when it is part of the module's contract.
-  - Keep complex logic in pure, testable modules (see `src/introspect.ts`)
+  - Keep complex logic in pure, testable modules (see `src/pi-thinking.ts`)
     and keep thin wrappers thin.
 - Tests live in `tests/`, one file per source module, `*.test.ts`.

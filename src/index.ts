@@ -5,7 +5,7 @@ import { createContextTool, createModelTool, createThinkingTool } from "./tools.
  * pi-introspect: self-reflection tools for the pi coding agent.
  *
  * Registers tools that let the LLM inspect its own runtime: model metadata,
- * context window usage, thinking level, and reasoning budget.
+ * context window usage, thinking level, and thinking budget.
  */
 export default function piIntrospect(pi: ExtensionAPI) {
   pi.registerTool(createModelTool());

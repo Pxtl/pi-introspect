@@ -1,9 +1,9 @@
 /**
- * Pure introspection logic for pi-introspect.
+ * Pure thinking-level logic for pi-introspect.
  *
  * These helpers mirror pi coding agent runtime behavior (thinking budgets,
- * level-to-effort mapping, context usage math) and are kept free of pi
- * imports so they can be unit tested in isolation.
+ * level-to-effort mapping, token formatting) and are kept free of pi imports
+ * so they can be unit tested in isolation.
  */
 
 /** pi thinking levels, as reported by `ctx.thinkingLevel`. */
@@ -59,10 +59,10 @@ export function mergeThinkingBudgets(custom?: ThinkingBudgets): Record<BudgetedT
 }
 
 /**
- * Reasoning token budget pi requests for a thinking level, or null when
+ * Thinking token budget pi requests for a thinking level, or null when
  * thinking is off. `xhigh`/`max` use the `high` budget.
  */
-export function resolveReasoningBudget(level: ThinkingLevel, customBudgets?: ThinkingBudgets): number | null {
+export function resolveThinkingBudget(level: ThinkingLevel, customBudgets?: ThinkingBudgets): number | null {
   const clamped = clampLevelForBudget(level);
   if (clamped === null) {
     return null;
@@ -71,11 +71,11 @@ export function resolveReasoningBudget(level: ThinkingLevel, customBudgets?: Thi
   return mergeThinkingBudgets(customBudgets)[clamped];
 }
 
-/** Reasoning budget for every level, null where thinking is disabled. */
-export function reasoningBudgetTable(customBudgets?: ThinkingBudgets): Record<ThinkingLevel, number | null> {
+/** Thinking budget for every level, null where thinking is disabled. */
+export function thinkingBudgetTable(customBudgets?: ThinkingBudgets): Record<ThinkingLevel, number | null> {
   const table = {} as Record<ThinkingLevel, number | null>;
   for (const level of THINKING_LEVELS) {
-    table[level] = resolveReasoningBudget(level, customBudgets);
+    table[level] = resolveThinkingBudget(level, customBudgets);
   }
 
   return table;

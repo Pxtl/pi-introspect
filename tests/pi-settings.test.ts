@@ -7,7 +7,7 @@ import {
   projectSettingsPath,
   readThinkingBudgets,
   resolveThinkingBudgets,
-} from "../src/settings.js";
+} from "../src/pi-settings.js";
 
 let workDir: string;
 

@@ -5,9 +5,9 @@ import {
   formatTokens,
   mergeThinkingBudgets,
   providerEffortForLevel,
-  reasoningBudgetTable,
-  resolveReasoningBudget,
-} from "../src/introspect.js";
+  resolveThinkingBudget,
+  thinkingBudgetTable,
+} from "../src/pi-thinking.js";
 
 describe("clampLevelForBudget", () => {
   it("maps xhigh and max to high", () => {
@@ -42,32 +42,32 @@ describe("mergeThinkingBudgets", () => {
   });
 });
 
-describe("resolveReasoningBudget", () => {
+describe("resolveThinkingBudget", () => {
   it("resolves pi default budgets per level", () => {
-    expect(resolveReasoningBudget("minimal")).toBe(1024);
-    expect(resolveReasoningBudget("low")).toBe(2048);
-    expect(resolveReasoningBudget("medium")).toBe(8192);
-    expect(resolveReasoningBudget("high")).toBe(16384);
+    expect(resolveThinkingBudget("minimal")).toBe(1024);
+    expect(resolveThinkingBudget("low")).toBe(2048);
+    expect(resolveThinkingBudget("medium")).toBe(8192);
+    expect(resolveThinkingBudget("high")).toBe(16384);
   });
 
   it("clamps xhigh and max to the high budget", () => {
-    expect(resolveReasoningBudget("xhigh")).toBe(16384);
-    expect(resolveReasoningBudget("max")).toBe(16384);
+    expect(resolveThinkingBudget("xhigh")).toBe(16384);
+    expect(resolveThinkingBudget("max")).toBe(16384);
   });
 
   it("returns null when thinking is off", () => {
-    expect(resolveReasoningBudget("off")).toBeNull();
+    expect(resolveThinkingBudget("off")).toBeNull();
   });
 
   it("honors custom budgets", () => {
-    expect(resolveReasoningBudget("medium", { medium: 500 })).toBe(500);
-    expect(resolveReasoningBudget("xhigh", { high: 7777 })).toBe(7777);
+    expect(resolveThinkingBudget("medium", { medium: 500 })).toBe(500);
+    expect(resolveThinkingBudget("xhigh", { high: 7777 })).toBe(7777);
   });
 });
 
-describe("reasoningBudgetTable", () => {
+describe("thinkingBudgetTable", () => {
   it("covers every level with null for off", () => {
-    const table = reasoningBudgetTable();
+    const table = thinkingBudgetTable();
     expect(table.off).toBeNull();
     expect(table.minimal).toBe(1024);
     expect(table.low).toBe(2048);

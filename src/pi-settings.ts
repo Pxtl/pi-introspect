@@ -1,7 +1,15 @@
+/**
+ * Reading of pi coding agent settings files.
+ *
+ * This module reads the `thinkingBudgets` overrides out of pi's own settings
+ * files (the agent-directory settings, then the project settings) -- it does
+ * not read any settings of the pi-introspect package itself.
+ */
+
 import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { type BudgetedThinkingLevel, DEFAULT_THINKING_BUDGETS, type ThinkingBudgets } from "./introspect.js";
+import { type BudgetedThinkingLevel, DEFAULT_THINKING_BUDGETS, type ThinkingBudgets } from "./pi-thinking.js";
 
 const BUDGET_LEVELS: readonly BudgetedThinkingLevel[] = ["minimal", "low", "medium", "high"];
 

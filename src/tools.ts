@@ -1,16 +1,25 @@
+/**
+ * The pi-introspect tools.
+ *
+ * Thin pi ExtensionTool factories wrapping the pure helpers in the other
+ * modules: each tool assembles its payload from pi-thinking, pi-settings, and
+ * pi-models, and wraps it as a JSON text result with the payload in details.
+ */
+
 import { Type } from "typebox";
 import type { ExtensionToolContext } from "@earendil-works/pi-coding-agent";
 import {
   DEFAULT_THINKING_BUDGETS,
   formatTokens,
   providerEffortForLevel,
-  reasoningBudgetTable,
-  resolveReasoningBudget,
   THINKING_LEVELS,
+  thinkingBudgetTable,
+  resolveThinkingBudget,
   type ThinkingLevel,
   type ThinkingLevelMap,
-} from "./introspect.js";
-import { resolveThinkingBudgets } from "./settings.js";
+} from "./pi-thinking.js";
+import { resolveThinkingBudgets } from "./pi-settings.js";
+import { modelInfo, modelLabel } from "./pi-models.js";
 
 /** Result payload shared by every introspect tool. */
 export interface IntrospectResult {
@@ -26,31 +35,9 @@ function jsonResult(payload: unknown): IntrospectResult {
   };
 }
 
-/** `"provider/id"` label for the active model, if any. */
-function modelLabel(ctx: ExtensionToolContext): string | null {
-  const model = ctx.model;
-  return model ? `${model.provider}/${model.id}` : null;
-}
-
 /** Tool result for "no active model" states. */
 function noModelResult(): IntrospectResult {
   return jsonResult({ error: "No active model selected in this session." });
-}
-
-/** Resolve the effective request baseUrl without exposing credentials. */
-async function resolvedRequestBaseUrl(ctx: ExtensionToolContext): Promise<string | undefined> {
-  const model = ctx.model;
-  if (!model) {
-    return undefined;
-  }
-
-  try {
-    const auth = await ctx.modelRegistry.getApiKeyAndHeaders(model);
-    return auth.ok ? auth.baseUrl : undefined;
-  } catch {
-    // Auth resolution is best-effort; the catalog baseUrl is still reported.
-    return undefined;
-  }
 }
 
 /**
@@ -70,27 +57,10 @@ export function createModelTool() {
     parameters: Type.Object({}),
 
     async execute(_toolCallId: string, _params: Record<string, never>, _signal: AbortSignal | undefined, _onUpdate: unknown, ctx: ExtensionToolContext): Promise<IntrospectResult> {
-      const model = ctx.model;
-      if (!model) {
+      const info = await modelInfo(ctx);
+      if (!info) {
         return noModelResult();
       }
-
-      const resolvedBaseUrl = await resolvedRequestBaseUrl(ctx);
-      const info = {
-        id: model.id,
-        name: model.name,
-        provider: model.provider,
-        providerDisplayName: ctx.modelRegistry.getProviderDisplayName(model.provider),
-        api: model.api,
-        baseUrl: model.baseUrl,
-        resolvedRequestBaseUrl: resolvedBaseUrl ?? null,
-        reasoning: model.reasoning,
-        thinkingLevelMap: model.thinkingLevelMap ?? null,
-        contextWindow: model.contextWindow,
-        maxTokens: model.maxTokens,
-        input: model.input,
-        cost: model.cost ?? null,
-      };
 
       return jsonResult(info);
     },
@@ -139,14 +109,14 @@ export function createContextTool() {
   };
 }
 
-/** Current thinking level, reasoning budget, and provider-level mapping. */
+/** Current thinking level, thinking budget, and provider-level mapping. */
 export function createThinkingTool() {
   return {
     name: "introspect_thinking",
     label: "Introspect Thinking",
     description:
-      "Report the current thinking level and effective reasoning budget: the active pi thinking level, whether the model supports reasoning, the reasoning token budget for the current level (pi defaults merged with thinkingBudgets settings overrides), the budget per level, and the model's provider-specific thinkingLevelMap.",
-    promptSnippet: "Check the current thinking level and effective reasoning token budget.",
+      "Report the current thinking level and effective thinking budget: the active pi thinking level, whether the model supports reasoning, the thinking token budget for the current level (pi defaults merged with thinkingBudgets settings overrides), the budget per level, and the model's provider-specific thinkingLevelMap.",
+    promptSnippet: "Check the current thinking level and effective thinking token budget.",
     promptGuidelines: [
       "Use introspect_thinking when reasoning behavior or budget matters, such as diagnosing why a response seems to think too little.",
     ],
@@ -161,8 +131,9 @@ export function createThinkingTool() {
 
       const { budgets, sources } = resolveThinkingBudgets(ctx.cwd);
       const levelMap: ThinkingLevelMap | undefined = model?.thinkingLevelMap;
-      const table = reasoningBudgetTable(budgets);
+      const table = thinkingBudgetTable(budgets);
       const effectiveLevel: ThinkingLevel = level ?? "off";
+      const thinkingBudget = resolveThinkingBudget(effectiveLevel, budgets);
 
       const levels = THINKING_LEVELS.map((name) => ({
         level: name,
@@ -174,8 +145,8 @@ export function createThinkingTool() {
         model: modelLabel(ctx),
         thinkingLevel: level ?? null,
         modelSupportsReasoning: model ? model.reasoning : null,
-        reasoningBudgetTokens: resolveReasoningBudget(effectiveLevel, budgets),
-        reasoningBudgetFormatted: formatTokens(resolveReasoningBudget(effectiveLevel, budgets), "none (thinking off)"),
+        thinkingBudgetTokens: thinkingBudget,
+        thinkingBudgetFormatted: formatTokens(thinkingBudget, "none (thinking off)"),
         budgetDefaults: DEFAULT_THINKING_BUDGETS,
         budgetOverrides: sources.length > 0 ? budgets : undefined,
         budgetOverrideSources: sources,
