@@ -7,23 +7,23 @@ consideration before starting work.
 
 # Coding Standards
 
-This document captures the dotnet coding style patterns used in this project.
+This document captures the coding style patterns used in this project.
 
 Note to LLMs/Agents: Read the linked coding standards documents completely before
 making any changes or actions relevant to them.
 
 ## Common
 
-- Indent 4 spaces for C# or SQL source code, 2 spaces for Markdown, html, xml, json, or
+- Indent 2 spaces for TypeScript source code, 2 spaces for Markdown, html, xml, json, or
   other document or serialization or configuration files.
 
 ## Project Structure
 
 See [file-structure.md](doc/standards/file-structure.md).
 
-## C# Code
+## TypeScript Code
 
-See [c-sharp.md](doc/standards/c-sharp.md).
+See [typescript.md](doc/standards/typescript.md).
 
 ## GitHub
 

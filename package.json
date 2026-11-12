@@ -1,0 +1,54 @@
+{
+  "name": "pi-introspect",
+  "version": "0.1.0",
+  "description": "Pi extension tools for agent self-reflection: model metadata, context window usage, thinking level, and reasoning budget.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Pxtl",
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "introspection",
+    "self-reflection"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pxtl/pi-introspect.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Pxtl/pi-introspect/issues"
+  },
+  "homepage": "https://github.com/Pxtl/pi-introspect#readme",
+  "files": [
+    "src",
+    "skills",
+    "README.md",
+    "LICENSE"
+  ],
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ],
+    "skills": [
+      "./skills"
+    ]
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm test"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": ">=1.3.0 <2"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "^1.5.0",
+    "@types/node": "^24.0.0",
+    "typebox": "latest",
+    "typescript": "latest",
+    "vitest": "latest"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

@@ -1,31 +1,35 @@
 # File Structure Standards
 
-This document describes the file layout for dotnet-based repos.
+This document describes the file layout for this repo, a pi coding agent
+package written in TypeScript.
 
 ## Directory Tree
 
-Source files go in `src/{{ ProjName }}`, tests go in `tests/{{ TestProjName }}`,
-there shall be a single `.slnx` file at the repo root, supplementary markdown
-documents go in `doc/`, experiments go in the `.gitignore`d `temp/` dir.  If a
-directory needs commentary that can't be associated to a single file (for
-example contains files that are not practically commentable, such as images),
-then createa directory-local `README.md`.
+Source files go in `src/`, tests go in `tests/`, the package skill goes in
+`skills/`, supplementary markdown documents go in `doc/`, experiments go in the
+`.gitignore`d `temp/` dir.  If a directory needs commentary that can't be
+associated to a single file (for example contains files that are not practically
+commentable, such as images), then create a directory-local `README.md`.
 
 ## Subdirectories
 
-- In dotnet projects, directories shall correspond to namespaces.
+- Keep `src/` flat unless the package grows enough that submodules clarify it.
 
 ## Files
 
-- In dotnet projects, code files shall be named after the dominant class in the
-  file.
+- Code files shall be named after the dominant type in the file.
+- The extension entry point is `src/index.ts`, declaring the default factory
+  function that receives the pi `ExtensionAPI`.
 
 ## Docs
 
 - Repo-standard markdown docs go at root in ALLCAPS. Additional docs go in
   `doc/` and are `kebab-cased.md`.
 
-## .csproj files
+## package.json
 
-Proj files should import `Standard.props` where possible, which will provide the
-default C# compiler settings and style enforcement.
+- The `pi` manifest declares entry points: `extensions` (the extension
+  TypeScript entry) and `skills` (skill directories).
+- Runtime deps (if any) go in `dependencies`; pi-provided packages such as
+  `@earendil-works/pi-coding-agent` and `typebox` are host-mapped and must
+  only appear in `peerDependencies`/`devDependencies`.
