@@ -19,6 +19,9 @@
     "url": "https://github.com/Pxtl/pi-introspect/issues"
   },
   "homepage": "https://github.com/Pxtl/pi-introspect#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "src",
     "skills",
