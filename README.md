@@ -48,3 +48,14 @@ See [AGENTS.md](AGENTS.md) and [CONTRIB.md](CONTRIB.md).  In short:
 npm install --include=dev
 npm run check   # typecheck + unit tests
 ```
+
+## Publishing
+
+Publishing requires the `NPM_TOKEN` repository secret: an npm automation
+token with publish access (create one in your npm account settings).  With
+it in place, the [publish workflow](.github/workflows/publish.yml) runs when
+you either:
+
+- push a tag `v<version>` matching the `package.json` version, or
+- run the workflow manually and enter the version (handy for retries, e.g.
+  after rotating the token - no tag re-push needed).

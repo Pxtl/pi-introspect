@@ -1,3 +1,6 @@
+# Publishes pi-introspect to npm. Requires the repo secret NPM_TOKEN
+# (an npm automation token with publish access).
+
 name: publish
 
 on:
