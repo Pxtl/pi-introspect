@@ -5,26 +5,33 @@ project.  See [TODO.md](TODO.md) (if any) for things that are ready to work on,
 [PLAN.md](PLAN.md) (if any) for longer-term plans that require discussion and
 consideration before starting work.
 
-# Coding Standards
+## Agents
+
+3rd-party agentic code (as in agentic code not made by "pxtl-clod") is accepted
+if a human operator has fully reviewed and understands and can defend every line
+of the change before submitting a PR. "Vibe coding" is prohibited. See
+[AGENTS.md](AGENTS.md).
+
+## Coding Standards
 
 This document captures the coding style patterns used in this project.
 
 Note to LLMs/Agents: Read the linked coding standards documents completely before
 making any changes or actions relevant to them.
 
-## Common
+### Common
 
 - Indent 2 spaces for TypeScript source code, 2 spaces for Markdown, html, xml, json, or
   other document or serialization or configuration files.
 
-## Project Structure
+### Project Structure
 
 See [file-structure.md](doc/standards/file-structure.md).
 
-## TypeScript Code
+### TypeScript Code
 
 See [typescript.md](doc/standards/typescript.md).
 
-## GitHub
+### GitHub
 
 See [github.md](doc/standards/github.md).
