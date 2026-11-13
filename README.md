@@ -49,13 +49,31 @@ npm install --include=dev
 npm run check   # typecheck + unit tests
 ```
 
-## Publishing
+## Releasing
 
-Publishing requires the `NPM_TOKEN` repository secret: an npm automation
-token with publish access (create one in your npm account settings).  With
-it in place, the [publish workflow](.github/workflows/publish.yml) runs when
-you either:
+Publishing is two-stage: a *stage* step (token) that a human approves, and
+a *publish* step (trusted publishing) for day-to-day tags.
 
-- push a tag `v<version>` matching the `package.json` version, or
-- run the workflow manually and enter the version (handy for retries, e.g.
-  after rotating the token - no tag re-push needed).
+One-time setup:
+
+- Set the `NPM_TOKEN` repository secret to a "Read and write (stage only)"
+  GitHub access token.
+- In your npm account, enable trusted publishing for `pi-introspect` and
+  trust this repository's tag pushes from `.github/workflows/publish.yml`.
+
+First release (the package does not exist on npm yet, so trusted publishing
+cannot create it):
+
+1. Run the [stage workflow](.github/workflows/stage.yml) manually, entering
+   the `package.json` version.
+2. Approve the staged package in the npm web UI (requires 2FA).
+
+Subsequent releases: bump the version in `package.json` and commit, then:
+
+```bash
+git tag -a v<version> -m "v<version>"
+git push origin v<version>
+```
+
+The [publish workflow](.github/workflows/publish.yml) runs on the tag and
+publishes via trusted publishing -- no token, no manual step.
