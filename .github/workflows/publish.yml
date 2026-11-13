@@ -1,5 +1,8 @@
-# Publishes pi-introspect to npm. Requires the repo secret NPM_TOKEN
-# (an npm automation token with publish access).
+# Publishes pi-introspect to npm via trusted publishing (OIDC). No token is
+# needed: the npm registry is pre-configured to trust pushes from this repo
+# (see the npm "trusted publishing" setup for this package). Triggered by
+# pushing a version tag (e.g. v1.2.3) whose number matches package.json, or
+# manually via the "Run workflow" action (handy for debugging).
 
 name: publish
 
@@ -16,18 +19,27 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
+      # Re-tries (workflow_dispatch) publish main. Fail fast, informatively, if
+      # the manual run was started on any other branch.
+      - name: 'Guard: workflow_dispatch re-tries must run on main'
+        if: github.event_name == 'workflow_dispatch' && github.ref_name != 'main'
+        run: |
+          echo "::error::workflow_dispatch re-tries must run on 'main' (current: '${{ github.ref_name }}')." >&2
+          exit 1
+
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
 
       - name: Verify declared version matches package version
@@ -53,12 +65,7 @@ jobs:
       - name: Typecheck and test
         run: npm run check
 
-      - name: Configure npm auth
-        # Write the token to ~/.npmrc: npm does not read NODE_AUTH_TOKEN on its
-        # own, and setup-node only wires it up when given a registry-url.
-        run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Publish to npm
-        run: npm publish
+        # --ignore-scripts: this package has no publish scripts; skip them so
+        # a future lifecycle script cannot run arbitrary code at publish time.
+        run: npm publish --ignore-scripts
