@@ -1,5 +1,7 @@
-# Publishes pi-introspect to npm. Requires the repo secret NPM_TOKEN
-# (an npm automation token with publish access).
+# Publishes pi-introspect to npm via trusted publishing (OIDC). No token is
+# needed: the npm registry is pre-configured to trust tag pushes from this
+# repo (see the npm "trusted publishing" setup for this package). Triggered
+# by pushing a version tag (e.g. v1.2.3) whose number matches package.json.
 
 name: publish
 
@@ -7,15 +9,10 @@ on:
   push:
     tags:
       - 'v*'
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version to publish (must equal the package.json version)'
-        required: true
-        type: string
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   publish:
@@ -27,23 +24,15 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
 
-      - name: Verify declared version matches package version
-        env:
-          EVENT: ${{ github.event_name }}
-          TAG: ${{ github.ref_name }}
-          INPUT_VERSION: ${{ github.event.inputs.version }}
+      - name: Verify tag matches package version
         run: |
-          if [ "$EVENT" = "push" ]; then
-            EXPECTED="${TAG#v}"
-          else
-            EXPECTED="$INPUT_VERSION"
-          fi
+          TAG="${GITHUB_REF_NAME#v}"
           VERSION="$(node -p "require('./package.json').version")"
-          if [ "$EXPECTED" != "$VERSION" ]; then
-            echo "Declared version v${EXPECTED} does not match package.json version ${VERSION}" >&2
+          if [ "$TAG" != "$VERSION" ]; then
+            echo "Tag v${TAG} does not match package.json version ${VERSION}" >&2
             exit 1
           fi
 
@@ -53,12 +42,7 @@ jobs:
       - name: Typecheck and test
         run: npm run check
 
-      - name: Configure npm auth
-        # Write the token to ~/.npmrc: npm does not read NODE_AUTH_TOKEN on its
-        # own, and setup-node only wires it up when given a registry-url.
-        run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Publish to npm
-        run: npm publish
+        # --ignore-scripts: this package has no publish scripts; skip them so
+        # a future lifecycle script cannot run arbitrary code at publish time.
+        run: npm publish --ignore-scripts

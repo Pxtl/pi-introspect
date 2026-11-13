@@ -1,0 +1,59 @@
+# Stages pi-introspect for npm review (staged publishing). Uses the repo
+# secret NPM_TOKEN, which must be a "Read and write (stage only)" GitHub
+# access token (GAT). Staging does not publish: it creates a staged package
+# that a human must approve in the npm web UI (or `npm stage approve` with
+# 2FA). Manual trigger only (workflow_dispatch) -- this is the first-run path
+# and a manual escape hatch; day-to-day releases go through publish.yml.
+
+name: stage
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to stage (must equal the package.json version)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  stage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Verify declared version matches package version
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.version }}
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          if [ "$INPUT_VERSION" != "$VERSION" ]; then
+            echo "Declared version $INPUT_VERSION does not match package.json version $VERSION" >&2
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck and test
+        run: npm run check
+
+      - name: Configure npm auth
+        # Write the stage-only token to ~/.npmrc: npm does not read
+        # NODE_AUTH_TOKEN on its own, and setup-node only wires it up when
+        # given a registry-url.
+        run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Stage publish to npm
+        run: npm stage publish
