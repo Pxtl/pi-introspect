@@ -49,6 +49,4 @@ npm install --include=dev
 npm run check   # typecheck + unit tests
 ```
 
-## Releasing
-
-Maintainers: see [Publishing](doc/publishing.md) for the release process.
+Releasing: see [Publishing](doc/publishing.md).
