@@ -27,7 +27,7 @@ jobs:
     steps:
       # Re-tries (workflow_dispatch) publish main. Fail fast, informatively, if
       # the manual run was started on any other branch.
-      - name: Guard: workflow_dispatch re-tries must run on main
+      - name: 'Guard: workflow_dispatch re-tries must run on main'
         if: github.event_name == 'workflow_dispatch' && github.ref_name != 'main'
         run: |
           echo "::error::workflow_dispatch re-tries must run on 'main' (current: '${{ github.ref_name }}')." >&2
