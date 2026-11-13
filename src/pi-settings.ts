@@ -40,7 +40,9 @@ export function readThinkingBudgets(path: string): ThinkingBudgets | undefined {
 }
 
 /** Agent-directory settings path, honoring pi's `PI_CODING_AGENT_DIR` override. */
-export function agentSettingsPath(agentDir = process.env.PI_CODING_AGENT_DIR ?? join(homedir(), ".pi", "agent")): string {
+export function agentSettingsPath(
+  agentDir = process.env.PI_CODING_AGENT_DIR ?? join(homedir(), ".pi", "agent")
+): string {
   return join(agentDir, "settings.json");
 }
 
@@ -54,7 +56,10 @@ export function projectSettingsPath(cwd: string): string {
  * settings, then by project settings (project wins, per pi's settings
  * precedence).
  */
-export function resolveThinkingBudgets(cwd: string, agentDir?: string): { budgets: Record<BudgetedThinkingLevel, number>; sources: string[] } {
+export function resolveThinkingBudgets(
+  cwd: string,
+  agentDir?: string
+): { budgets: Record<BudgetedThinkingLevel, number>; sources: string[] } {
   const globalPath = agentSettingsPath(agentDir);
   const projectPath = projectSettingsPath(cwd);
 
