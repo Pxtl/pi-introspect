@@ -1,7 +1,8 @@
 # Publishes pi-introspect to npm via trusted publishing (OIDC). No token is
-# needed: the npm registry is pre-configured to trust tag pushes from this
-# repo (see the npm "trusted publishing" setup for this package). Triggered
-# by pushing a version tag (e.g. v1.2.3) whose number matches package.json.
+# needed: the npm registry is pre-configured to trust pushes from this repo
+# (see the npm "trusted publishing" setup for this package). Triggered by
+# pushing a version tag (e.g. v1.2.3) whose number matches package.json, or
+# manually via the "Run workflow" action (handy for debugging).
 
 name: publish
 
@@ -9,6 +10,12 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (must equal the package.json version)'
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -27,12 +34,20 @@ jobs:
           node-version: 24
           cache: npm
 
-      - name: Verify tag matches package version
+      - name: Verify declared version matches package version
+        env:
+          EVENT: ${{ github.event_name }}
+          TAG: ${{ github.ref_name }}
+          INPUT_VERSION: ${{ github.event.inputs.version }}
         run: |
-          TAG="${GITHUB_REF_NAME#v}"
+          if [ "$EVENT" = "push" ]; then
+            EXPECTED="${TAG#v}"
+          else
+            EXPECTED="$INPUT_VERSION"
+          fi
           VERSION="$(node -p "require('./package.json').version")"
-          if [ "$TAG" != "$VERSION" ]; then
-            echo "Tag v${TAG} does not match package.json version ${VERSION}" >&2
+          if [ "$EXPECTED" != "$VERSION" ]; then
+            echo "Declared version v${EXPECTED} does not match package.json version ${VERSION}" >&2
             exit 1
           fi
 
