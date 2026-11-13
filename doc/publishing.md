@@ -23,8 +23,15 @@ The package now exists on npm.
 ## Enabling trusted publishing
 
 Now that the package exists on npm, enable trusted publishing for
-`pi-introspect` in your npm account and trust this repository's tag pushes
-from `.github/workflows/publish.yml`.
+`pi-introspect` in your npm account, pointing at
+`.github/workflows/publish.yml`. Trusted publishing matches the git ref each
+run presents, so configure **two** publisher refs:
+
+- `v*` -- lets tag pushes publish (the normal release path).
+- `main` -- lets the `workflow_dispatch` re-try publish from `main`.
+
+A manual run on any other branch presents a ref matching neither, so it is
+blocked (see "Re-trying a failed release").
 
 ## Subsequent releases
 
@@ -37,6 +44,16 @@ git push origin v<version>
 
 The [publish workflow](../.github/workflows/publish.yml) runs on the tag and
 publishes via trusted publishing -- no token, no manual step.
+
+## Re-trying a failed release
+
+If a tagged release fails, fix the problem on `main`, then run the [publish
+workflow](../.github/workflows/publish.yml) manually (the `workflow_dispatch`
+trigger) on `main`. It republishes the `package.json` version from `main`
+using the trusted `main` ref.
+
+A manual run on any branch other than `main` is rejected by a guard in the
+workflow before it reaches npm.
 
 ## Troubleshooting
 
