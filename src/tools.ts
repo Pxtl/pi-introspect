@@ -183,7 +183,7 @@ export function createThinkingTool() {
         thinkingBudgetTokens: thinkingBudget,
         thinkingBudgetFormatted: formatTokens(thinkingBudget, "none (thinking off)"),
         budgetDefaults: DEFAULT_THINKING_BUDGETS,
-        budgetOverrides: sources.length > 0 ? budgets : undefined,
+        resolvedBudgets: sources.length > 0 ? budgets : undefined,
         budgetOverrideSources: sources,
         thinkingLevelMap: levelMap ?? null,
         maxTokens: model?.maxTokens ?? null,
