@@ -53,7 +53,12 @@ jobs:
       - name: Typecheck and test
         run: npm run check
 
-      - name: Publish to npm
-        run: npm publish
+      - name: Configure npm auth
+        # Write the token to ~/.npmrc: npm does not read NODE_AUTH_TOKEN on its
+        # own, and setup-node only wires it up when given a registry-url.
+        run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish to npm
+        run: npm publish
