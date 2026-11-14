@@ -43,7 +43,7 @@ pi -e /path/to/pi-introspect
 ## Development
 
 <!-- using full GH URLs so we don't have to bundle .mds into the tarball -->
-See [CONTRIB.md](https://github.com/Pxtl/pi-introspect/blob/CONTRIB.md).
+See [CONTRIB.md](https://github.com/Pxtl/pi-introspect/blob/main/CONTRIB.md).
 
 In short:
 
