@@ -1,4 +1,7 @@
 # CHANGELOG
+## v0.1.3 - 2026-11-13
+- Fix documentation bug
+
 ## v0.1.2 - 2026-11-13
 - Clean-up documentation 
   - human-edit `README.md`, fix hyperlinks
